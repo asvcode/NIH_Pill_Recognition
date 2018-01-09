@@ -7,7 +7,8 @@ Using pre-trained vgg-16 with Tensorflow. Training set of 40, Test set of 10 and
 #### Test Image
 ![](images/test.png) 
 
-#### Image manipulation included 4 different manipulation algorithms
+#### Image manipulation included 4 different manipulation algorithms:
+##### Original
 
 ![](images/capsule_1_resize.jpg "Original")![](images/color_resize.jpg "Sharpen")![](images/hist_org_resize.jpg "Histogram")
 
