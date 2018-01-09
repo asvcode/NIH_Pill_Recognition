@@ -8,9 +8,11 @@ Using pre-trained vgg-16 with Tensorflow. Training set of 40, Test set of 10 and
 ![](images/test.png) 
 
 #### Image manipulation included 4 different manipulation algorithms
-<p align="center">
-<imgsrc="images/capsule_1.jpg" width=110/><img src="images/capsule_1.jpg" width=110 title="Original" /><img src="images/lesson1_notes_Page_03.jpg" width=110 /><img src="images/lesson1_notes_Page_04.jpg" width=110 /><img src="images/lesson1_notes_Page_05.jpg" width=110 /><img src="images/lesson1_notes_Page_06.jpg" width=110 /><img src="images/lesson1_notes_Page_07.jpg" width=110 /><img src="images/lesson1_notes_Page_08.jpg" width=110 />
-</p>
+
+![Original](images/capsule_1.jpg) ![Sharpen](images/capsule_1_s.jpg)
+
+
+
 
 [Fastai repository](https://github.com/fastai/fastai) Fastai Version 2 Part 1 repository
 
