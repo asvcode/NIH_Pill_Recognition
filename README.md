@@ -5,7 +5,8 @@ Testing ground for improving medication recognition with minimal data
 Using pre-trained vgg-16 with Tensorflow. Training set of 40, Test set of 10 and Validation set of 10.
 
 #### Test Image
-</images/test.png>
+![](images/test.png) 
+
 
 # Course Links
 [Fastai repository](https://github.com/fastai/fastai) Fastai Version 2 Part 1 repository
