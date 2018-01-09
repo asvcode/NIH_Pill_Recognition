@@ -9,7 +9,7 @@ Using pre-trained vgg-16 with Tensorflow. Training set of 40, Test set of 10 and
 
 #### Image manipulation included 4 different manipulation algorithms
 
-![Original](images/capsule_1.jpg) ![Sharpen](images/capsule_1_s.jpg)
+![](images/capsule_1.jpg "Original") ![Sharpen](images/capsule_1_s.jpg "Sharpen")
 
 
 
