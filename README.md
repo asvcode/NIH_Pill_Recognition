@@ -57,5 +57,7 @@ What does a sample picture look like using a combination of RandomRotateZoom + A
 
  For additional information you also refer to two articles I have written
  
- Data Augmentation Experimentation [Towards Data Science](https://towardsdatascience.com/data-augmentation-experimentation-3e274504f04b).
+ #### Data Augmentation Experimentation [Towards Data Science](https://towardsdatascience.com/data-augmentation-experimentation-3e274504f04b).
+ 
+ #### Data Augmentation Using Fastai [Becoming Human](https://becominghuman.ai/data-augmentation-using-fastai-aefa88ca03f1)
 
