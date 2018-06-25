@@ -29,6 +29,9 @@ Using pre-trained vgg-16 with Tensorflow. Training set of 40, Test set of 10 and
 ![](images/capsule_1_e.jpg "Original")![](images/edges.png "Sharpen")![](images/hist_edge.jpg "Histogram")
 
 ### 2) Effect of different transformations on accuracy and error rate
+
+ - Experimention done using transforms_playground.ipynb
+ 
  - The train set has 1040 images and the test set has 208 images
  - Training was done using Leslie Smith’s one cycle method
  - Training was done with a high learning rate, low cycle length, dedicating 5% of the cycle to annealing at the end with a maximum 
