@@ -49,7 +49,11 @@ The aim of this project was to find the highest accuracy with the lowest number 
 
 The summary of the results shows that [RandomZoomRotate] had the most correctly chosen labels and [Padding(50)] had the least number of incorrectly chosen labels. Vice versa [Cutout] had the least number of correctly chosen labels and [RandomLighting + Dihedral] had the highest number of incorrectly chosen numbers
 
-![](images/transforms_total.png "Transformation Results")
+![](images/transforms_total.png "Total Transformation Results")
+
+What does a sample picture look like using a combination of RandomRotateZoom + AddPadding?
+
+![](images/combination.png "Combination of RandomRotateZoom + Padding")
 
  
 
