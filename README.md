@@ -28,3 +28,14 @@ Using pre-trained vgg-16 with Tensorflow. Training set of 40, Test set of 10 and
 
 ![](images/capsule_1_e.jpg "Original")![](images/edges.png "Sharpen")![](images/hist_edge.jpg "Histogram")
 
+### 2) Effect of different transformations on accuracy and error rate
+ - The train set has 1040 images and the test set has 208 images
+ - Training was done using Leslie Smith’s one cycle method
+ - Training was done with a high learning rate, low cycle length, dedicating 5% of the cycle to annealing at the end with a maximum 
+   momentum of 0.95 and a minimum momentum of 0.85 and a weight decay of 1e-5
+ - There were a total number of 82 different labels that ranged from describing the shape, color, surface markings, strength; for  
+   example a capsule could have the following labels [capsule], [blue], [TEVA], [multi color], [white], [capsule shape], [25mg] etc
+ - The results were broken down into 1) N: The total number of correct labels predicted, 2) Accuracy: (N/82)*100 where 82 is the total
+   number of labels, 3) E: The total number of incorrect labels predicted and 4) Error: (E/N)*100
+ 
+
