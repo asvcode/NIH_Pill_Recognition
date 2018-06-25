@@ -40,5 +40,12 @@ Using pre-trained vgg-16 with Tensorflow. Training set of 40, Test set of 10 and
    example a capsule could have the following labels [capsule], [blue], [TEVA], [multi color], [white], [capsule shape], [25mg] etc
  - The results were broken down into 1) N: The total number of correct labels predicted, 2) Accuracy: (N/82)*100 where 82 is the total
    number of labels, 3) E: The total number of incorrect labels predicted and 4) Error: (E/N)*100
+   
+##### Outcomes
+
+The aim of this project was to find the highest accuracy with the lowest number of errors in the shortest amount of time (average training time per 10 epochs was around 3 minutes) we can see that by using various data augmentation techniques plus Leslie Smith’s one cycle approach we can get a good indication of what data augmentation techniques work best for this data set.
+
+![](images/transform_result.png "Transformation Results")
+
  
 
