@@ -55,5 +55,7 @@ What does a sample picture look like using a combination of RandomRotateZoom + A
 
 ![](images/combination.png "Combination of RandomRotateZoom + Padding")
 
+ For additional information you also refer to two articles I have written
  
+ Data Augmentation Experimentation [Towards Data Science](https://towardsdatascience.com/data-augmentation-experimentation-3e274504f04b).
 
