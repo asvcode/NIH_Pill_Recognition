@@ -1,4 +1,4 @@
-# PillView
+# Prescription Pill Recognition
 Testing ground for improving medication recognition with minimal data
 
 ### 1) Impact of image manipulation
