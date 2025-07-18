@@ -4,18 +4,22 @@ from pathlib import Path
 
 import torch
 from torch import nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, models, transforms
+from sklearn.model_selection import train_test_split
+import csv
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a pill classifier")
-    parser.add_argument("data_dir", type=Path, help="Path to dataset root with train/val folders")
+    parser.add_argument("data_dir", type=Path, help="Path to dataset root with class subfolders")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--batch-size", type=int, default=32, help="Batch size")
     parser.add_argument("--lr", type=float, default=1e-3, help="Max learning rate for OneCycle")
     parser.add_argument("--output", type=Path, default=Path("outputs"), help="Directory to save model and metrics")
     parser.add_argument("--num-workers", type=int, default=4, help="Data loader workers")
+    parser.add_argument("--val-split", type=float, default=0.2, help="Fraction of data used for validation")
+    parser.add_argument("--patience", type=int, default=5, help="Early stopping patience")
 
     # augmentation options
     parser.add_argument("--resize", type=int, default=224, help="Resize shorter side to this size")
@@ -64,13 +68,25 @@ def get_dataloaders(data_dir: Path, batch_size: int, num_workers: int, args):
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ])
 
-    train_ds = datasets.ImageFolder(data_dir / "train", transform=train_tfm)
-    val_ds = datasets.ImageFolder(data_dir / "val", transform=val_tfm)
+    base_ds = datasets.ImageFolder(data_dir)
+    indices = list(range(len(base_ds)))
+    train_idx, val_idx = train_test_split(
+        indices,
+        test_size=args.val_split,
+        stratify=base_ds.targets,
+        random_state=42,
+    )
 
-    train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    val_dl = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    train_ds = datasets.ImageFolder(data_dir, transform=train_tfm)
+    val_ds = datasets.ImageFolder(data_dir, transform=val_tfm)
 
-    return train_dl, val_dl, len(train_ds.classes)
+    train_subset = Subset(train_ds, train_idx)
+    val_subset = Subset(val_ds, val_idx)
+
+    train_dl = DataLoader(train_subset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    val_dl = DataLoader(val_subset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+
+    return train_dl, val_dl, len(base_ds.classes)
 
 
 def build_model(num_classes: int):
@@ -136,22 +152,48 @@ def main():
     total_steps = args.epochs * len(train_dl)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=args.lr, total_steps=total_steps)
 
-    metrics = {"train_loss": [], "train_acc": [], "val_loss": [], "val_acc": []}
+    metrics = {"epoch": [], "train_loss": [], "train_acc": [], "val_loss": [], "val_acc": []}
+    csv_file = args.output / "metrics.csv"
+    with open(csv_file, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["epoch", "train_loss", "train_acc", "val_loss", "val_acc"])
+
+    best_acc = 0.0
+    epochs_no_improve = 0
 
     for epoch in range(1, args.epochs + 1):
         tr_loss, tr_acc = train_epoch(model, train_dl, criterion, optimizer, scheduler, device)
         val_loss, val_acc = evaluate(model, val_dl, criterion, device)
 
+        metrics["epoch"].append(epoch)
         metrics["train_loss"].append(tr_loss)
         metrics["train_acc"].append(tr_acc)
         metrics["val_loss"].append(val_loss)
         metrics["val_acc"].append(val_acc)
 
-        print(f"Epoch {epoch}/{args.epochs} - "
-              f"train_loss: {tr_loss:.4f} train_acc: {tr_acc:.4f} "
-              f"val_loss: {val_loss:.4f} val_acc: {val_acc:.4f}")
+        with open(csv_file, "a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([epoch, tr_loss, tr_acc, val_loss, val_acc])
 
-    torch.save(model.state_dict(), args.output / "model.pth")
+        print(
+            f"Epoch {epoch}/{args.epochs} - "
+            f"train_loss: {tr_loss:.4f} train_acc: {tr_acc:.4f} "
+            f"val_loss: {val_loss:.4f} val_acc: {val_acc:.4f}"
+        )
+
+        if val_acc > best_acc:
+            best_acc = val_acc
+            epochs_no_improve = 0
+            torch.save(model.state_dict(), args.output / "model_best.pth")
+        else:
+            epochs_no_improve += 1
+            if epochs_no_improve >= args.patience:
+                print(
+                    f"Early stopping at epoch {epoch} due to no improvement in validation accuracy"
+                )
+                break
+
+    torch.save(model.state_dict(), args.output / "model_final.pth")
     with open(args.output / "metrics.json", "w") as f:
         json.dump(metrics, f, indent=2)
 
