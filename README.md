@@ -59,5 +59,21 @@ What does a sample picture look like using a combination of RandomRotateZoom + A
  
  #### Data Augmentation Experimentation [Towards Data Science](https://towardsdatascience.com/data-augmentation-experimentation-3e274504f04b).
  
- #### Data Augmentation Using Fastai [Becoming Human](https://becominghuman.ai/data-augmentation-using-fastai-aefa88ca03f1)
+#### Data Augmentation Using Fastai [Becoming Human](https://becominghuman.ai/data-augmentation-using-fastai-aefa88ca03f1)
+
+### PyTorch training script
+
+The `src/train.py` script reproduces the augmentations explored above using
+`torchvision.transforms`. You can control each augmentation from the command
+line:
+
+```
+python src/train.py DATA_DIR \
+    --rotation 20 --zoom 0.2 --brightness 0.1 --contrast 0.1 \
+    --pad 50 --dihedral --cutout 0.4
+```
+
+This mirrors the `RandomZoomRotate`, `Padding`, `RandomLighting`+`Dihedral` and
+`Cutout` experiments for easy comparison.
+
 

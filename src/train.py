@@ -16,19 +16,50 @@ def parse_args():
     parser.add_argument("--lr", type=float, default=1e-3, help="Max learning rate for OneCycle")
     parser.add_argument("--output", type=Path, default=Path("outputs"), help="Directory to save model and metrics")
     parser.add_argument("--num-workers", type=int, default=4, help="Data loader workers")
+
+    # augmentation options
+    parser.add_argument("--resize", type=int, default=224, help="Resize shorter side to this size")
+    parser.add_argument("--pad", type=int, default=0, help="Reflection padding size")
+    parser.add_argument("--rotation", type=float, default=0.0, help="Max rotation degrees")
+    parser.add_argument("--zoom", type=float, default=0.0, help="Zoom range as fraction e.g. 0.2")
+    parser.add_argument("--brightness", type=float, default=0.0, help="Color jitter brightness")
+    parser.add_argument("--contrast", type=float, default=0.0, help="Color jitter contrast")
+    parser.add_argument("--dihedral", action="store_true", help="Apply horizontal and vertical flips")
+    parser.add_argument("--cutout", type=float, default=0.0, help="Probability of random erasing")
     return parser.parse_args()
 
 
-def get_dataloaders(data_dir: Path, batch_size: int, num_workers: int):
-    train_tfm = transforms.Compose([
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
+def get_dataloaders(data_dir: Path, batch_size: int, num_workers: int, args):
+    train_tfms = []
+    if args.pad > 0:
+        train_tfms.append(transforms.Pad(args.pad, padding_mode="reflect"))
+    train_tfms.append(transforms.Resize(args.resize))
+
+    scale = (1.0 - args.zoom, 1.0 + args.zoom) if args.zoom > 0 else (1.0, 1.0)
+    if args.rotation != 0.0 or args.zoom != 0.0:
+        train_tfms.append(transforms.RandomAffine(degrees=args.rotation, scale=scale))
+
+    if args.dihedral:
+        train_tfms.extend([transforms.RandomHorizontalFlip(), transforms.RandomVerticalFlip()])
+    else:
+        train_tfms.append(transforms.RandomHorizontalFlip())
+
+    if args.brightness > 0 or args.contrast > 0:
+        train_tfms.append(transforms.ColorJitter(brightness=args.brightness, contrast=args.contrast))
+
+    train_tfms.extend([
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ])
+
+    if args.cutout > 0:
+        train_tfms.append(transforms.RandomErasing(p=args.cutout))
+
+    train_tfm = transforms.Compose(train_tfms)
+
     val_tfm = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
+        transforms.Resize(args.resize + 32),
+        transforms.CenterCrop(args.resize),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ])
@@ -97,7 +128,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    train_dl, val_dl, num_classes = get_dataloaders(args.data_dir, args.batch_size, args.num_workers)
+    train_dl, val_dl, num_classes = get_dataloaders(args.data_dir, args.batch_size, args.num_workers, args)
     model = build_model(num_classes).to(device)
 
     criterion = nn.CrossEntropyLoss()
