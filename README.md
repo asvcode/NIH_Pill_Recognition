@@ -76,4 +76,40 @@ python src/train.py DATA_DIR \
 This mirrors the `RandomZoomRotate`, `Padding`, `RandomLighting`+`Dihedral` and
 `Cutout` experiments for easy comparison.
 
+### Requirements
+
+- Python 3 with `pip`
+- [PyTorch](https://pytorch.org/) and `torchvision`
+
+### Preparing the data
+
+Place your pill images in a directory where each class has its own
+subfolder. The structure should look like:
+
+```
+DATA_DIR/
+    class_a/
+        img1.jpg
+        img2.jpg
+    class_b/
+        img3.jpg
+        img4.jpg
+```
+
+### Example command
+
+Run training for 10 epochs with a batch size of 32:
+
+```
+python src/train.py DATA_DIR --epochs 10 --batch-size 32
+```
+
+### Outputs
+
+The script prints training progress to the console and writes model
+checkpoints and metrics under the directory given by `--output`
+(defaults to `outputs`).  `model_best.pth` is saved whenever validation
+accuracy improves, while `model_final.pth` and both `metrics.csv` and
+`metrics.json` are written at the end of training.
+
 
